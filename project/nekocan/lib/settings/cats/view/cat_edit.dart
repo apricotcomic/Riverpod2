@@ -3,16 +3,16 @@ import 'package:nekocan/model/cats.dart';
 import 'package:nekocan/common/cats_helper.dart';
 
 class CatEdit extends StatefulWidget {
-  final Cats? cats;
+  final int id;
 
-  const CatEdit({Key? key, this.cats}) : super(key: key);
+  const CatEdit({Key? key, required this.id}) : super(key: key);
 
   @override
   _CatEditState createState() => _CatEditState();
 }
 
 class _CatEditState extends State<CatEdit> {
-  late int id;
+  //late int id;
   late String name;
   late String birthday;
   late String gender;
@@ -24,18 +24,37 @@ class _CatEditState extends State<CatEdit> {
   static const int textExpandedFlex = 1; // 見出しのexpaded flexの比率
   static const int dataExpandedFlex = 4; // 項目のexpanede flexの比率
 
+  late Cats? cats;
+  bool isLoading = false;
+
 // Stateのサブクラスを作成し、initStateをオーバーライドすると、wedgit作成時に処理を動かすことができる。
 // ここでは、各項目の初期値を設定する
   @override
   void initState() {
     super.initState();
-    id = widget.cats?.id ?? 0;
-    name = widget.cats?.name ?? '';
-    birthday = widget.cats?.birthday ?? '';
-    gender = widget.cats?.gender ?? '';
-    _selected = widget.cats?.gender ?? '不明';
-    memo = widget.cats?.memo ?? '';
-    createdAt = widget.cats?.createdAt ?? DateTime.now();
+
+    if (widget.id == 0) {
+      name = '';
+      birthday = '';
+      gender = '不明';
+      memo = '';
+    } else {
+      catData();
+    }
+  }
+
+// initStateで動かす処理
+// catsテーブルから指定されたidのデータを1件取得する
+  Future catData() async {
+    setState(() => isLoading = true);
+    cats = await CatsHelper.instance.catData(widget.id);
+    name = cats!.name;
+    birthday = cats!.birthday;
+    gender = cats!.gender;
+    _selected = cats!.gender;
+    memo = cats!.memo;
+    createdAt = cats!.createdAt;
+    setState(() => isLoading = false);
   }
 
 // Dropdownの値の変更を行う
@@ -60,13 +79,16 @@ class _CatEditState extends State<CatEdit> {
         child: Column(children: <Widget>[
           Row(children: [
             // 名前の行の設定
-            const Expanded(                   // 見出し（名前）
+            const Expanded(
+              // 見出し（名前）
               flex: textExpandedFlex,
-              child: Text('名前',
+              child: Text(
+                '名前',
                 textAlign: TextAlign.center,
-              ), 
+              ),
             ),
-            Expanded(                         // 名前入力エリアの設定
+            Expanded(
+              // 名前入力エリアの設定
               flex: dataExpandedFlex,
               child: TextFormField(
                 maxLines: 1,
@@ -84,13 +106,16 @@ class _CatEditState extends State<CatEdit> {
           ]),
           // 性別の行の設定
           Row(children: [
-            const Expanded(                     // 見出し（性別）
+            const Expanded(
+              // 見出し（性別）
               flex: textExpandedFlex,
-              child: Text('性別',
+              child: Text(
+                '性別',
                 textAlign: TextAlign.center,
               ),
             ),
-            Expanded(                           // 性別をドロップダウンで設定
+            Expanded(
+              // 性別をドロップダウンで設定
               flex: dataExpandedFlex,
               child: DropdownButton(
                 key: const ValueKey('gender'),
@@ -106,13 +131,16 @@ class _CatEditState extends State<CatEdit> {
             ),
           ]),
           Row(children: [
-            const Expanded(                 // 見出し（誕生日）
+            const Expanded(
+              // 見出し（誕生日）
               flex: textExpandedFlex,
-              child: Text('誕生日',
+              child: Text(
+                '誕生日',
                 textAlign: TextAlign.center,
               ),
             ),
-            Expanded(                     // 誕生日入力エリアの設定
+            Expanded(
+              // 誕生日入力エリアの設定
               flex: dataExpandedFlex,
               child: TextFormField(
                 maxLines: 1,
@@ -126,13 +154,15 @@ class _CatEditState extends State<CatEdit> {
             ),
           ]),
           Row(children: [
-            const Expanded(                     // 見出し（メモ）
-              flex: textExpandedFlex,
-              child: Text('メモ',
-                textAlign: TextAlign.center,
-                )
-            ),
-            Expanded(                           // メモ入力エリアの設定
+            const Expanded(
+                // 見出し（メモ）
+                flex: textExpandedFlex,
+                child: Text(
+                  'メモ',
+                  textAlign: TextAlign.center,
+                )),
+            Expanded(
+              // メモ入力エリアの設定
               flex: dataExpandedFlex,
               child: TextFormField(
                 maxLines: 1,
@@ -158,8 +188,9 @@ class _CatEditState extends State<CatEdit> {
       child: ElevatedButton(
         child: const Text('保存'),
         style: ElevatedButton.styleFrom(
-          onPrimary: Colors.white,
-          primary: isFormValid ? Colors.redAccent : Colors.grey.shade700,
+          foregroundColor: Colors.white,
+          backgroundColor:
+              isFormValid ? Colors.redAccent : Colors.grey.shade700,
         ),
         onPressed: createOrUpdateCat, // 保存ボタンを押したら実行する処理を指定する
       ),
@@ -168,39 +199,39 @@ class _CatEditState extends State<CatEdit> {
 
 // 保存ボタンを押したとき実行する処理
   void createOrUpdateCat() async {
-    final isUpdate = (widget.cats != null);     // 画面が空でなかったら
-
-    if (isUpdate) {
-      await updateCat();                        // updateの処理
+    if (widget.id == 0) {
+      await updateCat(); // updateの処理
     } else {
-      await createCat();                        // insertの処理
+      await createCat(); // insertの処理
     }
 
-    Navigator.of(context).pop();                // 前の画面に戻る
+    Navigator.of(context).pop(); // 前の画面に戻る
   }
 
   // 更新処理の呼び出し
   Future updateCat() async {
-    final cat = widget.cats!.copy(              // 画面の内容をcatにセット
+    final cat = cats?.copy(
+      // 画面の内容をcatにセット
       name: name,
       birthday: birthday,
       gender: gender,
       memo: memo,
     );
 
-    await CatsHelper.instance.update(cat);        // catの内容で更新する
+    await CatsHelper.instance.update(cat!); // catの内容で更新する
   }
 
   // 追加処理の呼び出し
   Future createCat() async {
-    final cat = Cats(                           // 入力された内容をcatにセット
-      id: id,
+    final cat = Cats(
+      // 入力された内容をcatにセット
+      id: widget.id,
       name: name,
       birthday: birthday,
       gender: gender,
       memo: memo,
       createdAt: createdAt,
     );
-    await CatsHelper.instance.insert(cat);        // catの内容で追加する
+    await CatsHelper.instance.insert(cat); // catの内容で追加する
   }
 }

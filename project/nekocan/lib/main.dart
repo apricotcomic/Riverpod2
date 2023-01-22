@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nekocan/model/cats.dart';
 import 'package:nekocan/common/cats_helper.dart';
-import 'package:nekocan/settings/cats/view/cat_detail.dart';
 import 'package:nekocan/settings/cats/view/cat_edit.dart';
 
 void main() {
@@ -92,7 +91,7 @@ class _CatListPageState extends State<CatList> {
                     onTap: () async {                     // cardをtapしたときの処理を設定
                       await Navigator.of(context).push(   // ページ遷移をNavigatorで設定
                         MaterialPageRoute(
-                          builder: (context) => CatDetail(id: cat.id!),   // cardのデータの詳細を表示するcat_detail.dartへ遷移
+                          builder: (context) => CatEdit(id: cat.id!),   // cardのデータの詳細を表示するcat_detail.dartへ遷移
                         ),
                       );
                       getCatsList();    // データが更新されているかもしれないので、catsテーブル全件読み直し
@@ -107,7 +106,7 @@ class _CatListPageState extends State<CatList> {
         onPressed: () async {                                       // ＋ボタンを押したときの処理を設定
           await Navigator.of(context).push(                         // ページ遷移をNavigatorで設定
             MaterialPageRoute(
-              builder: (context) => const CatEdit()           // 詳細更新画面（元ネタがないから新規登録）を表示するcat_detail_edit.dartへ遷移
+              builder: (context) => const CatEdit(id:0)           // 詳細更新画面（元ネタがないから新規登録）を表示するcat_detail_edit.dartへ遷移
             ),
           );
           getCatsList();                                            // 新規登録されているので、catテーブル全件読み直し
