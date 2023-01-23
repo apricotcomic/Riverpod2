@@ -72,7 +72,14 @@ class _CatEditState extends State<CatEdit> {
       appBar: AppBar(
         title: const Text('猫編集'),
         actions: [
-          buildSaveButton(), // 保存ボタンを表示する
+          buildSaveButton(),
+          IconButton(
+            onPressed: () async {                         // ゴミ箱のアイコンが押されたときの処理を設定
+              await CatsHelper.instance.delete(widget.id);  // 指定されたidのデータを削除する
+              Navigator.of(context).pop();                // 削除後に前の画面に戻る
+            },
+            icon: const Icon(Icons.delete),               // ゴミ箱マークのアイコンを表示
+          ) // 保存ボタンを表示する
         ],
       ),
       body: SingleChildScrollView(
