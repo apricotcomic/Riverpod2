@@ -207,9 +207,9 @@ class _CatEditState extends State<CatEdit> {
 // 保存ボタンを押したとき実行する処理
   void createOrUpdateCat() async {
     if (widget.id == 0) {
-      await updateCat(); // updateの処理
-    } else {
       await createCat(); // insertの処理
+    } else {
+      await updateCat(); // updateの処理
     }
 
     Navigator.of(context).pop(); // 前の画面に戻る
