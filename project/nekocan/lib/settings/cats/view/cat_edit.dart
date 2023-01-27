@@ -34,10 +34,12 @@ class _CatEditState extends State<CatEdit> {
     super.initState();
 
     if (widget.id == 0) {
-      name = '';
-      birthday = '';
+      name = ' ';
+      birthday = ' ';
       gender = '不明';
-      memo = '';
+      _selected = '不明';
+      memo = ' ';
+      createdAt = DateTime.now();
     } else {
       catData();
     }
@@ -74,11 +76,12 @@ class _CatEditState extends State<CatEdit> {
         actions: [
           buildSaveButton(),
           IconButton(
-            onPressed: () async {                         // ゴミ箱のアイコンが押されたときの処理を設定
-              await CatsHelper.instance.delete(widget.id);  // 指定されたidのデータを削除する
-              Navigator.of(context).pop();                // 削除後に前の画面に戻る
+            onPressed: () async {
+              // ゴミ箱のアイコンが押されたときの処理を設定
+              await CatsHelper.instance.delete(widget.id); // 指定されたidのデータを削除する
+              Navigator.of(context).pop(); // 削除後に前の画面に戻る
             },
-            icon: const Icon(Icons.delete),               // ゴミ箱マークのアイコンを表示
+            icon: const Icon(Icons.delete), // ゴミ箱マークのアイコンを表示
           ) // 保存ボタンを表示する
         ],
       ),
