@@ -12,14 +12,13 @@ class CatEdit extends StatefulWidget {
 }
 
 class _CatEditState extends State<CatEdit> {
-  //late int id;
-  late String name;
-  late String birthday;
-  late String gender;
-  late String memo;
-  late DateTime createdAt;
+  String name = ' ';
+  String birthday = ' ';
+  String gender = '不明';
+  String memo = ' ';
+  DateTime createdAt = DateTime.now();
   final List<String> _list = <String>['男の子', '女の子', '不明']; // 性別のDropdownの項目を設定
-  late String _selected; // Dropdownの選択値を格納するエリア
+  String _selected = '不明'; // Dropdownの選択値を格納するエリア
   String value = '不明'; // Dropdownの初期値
   static const int textExpandedFlex = 1; // 見出しのexpaded flexの比率
   static const int dataExpandedFlex = 4; // 項目のexpanede flexの比率
@@ -33,14 +32,7 @@ class _CatEditState extends State<CatEdit> {
   void initState() {
     super.initState();
 
-    if (widget.id == 0) {
-      name = ' ';
-      birthday = ' ';
-      gender = '不明';
-      _selected = '不明';
-      memo = ' ';
-      createdAt = DateTime.now();
-    } else {
+    if (widget.id != 0) {
       catData();
     }
   }
@@ -85,107 +77,111 @@ class _CatEditState extends State<CatEdit> {
           ) // 保存ボタンを表示する
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(children: <Widget>[
-          Row(children: [
-            // 名前の行の設定
-            const Expanded(
-              // 見出し（名前）
-              flex: textExpandedFlex,
-              child: Text(
-                '名前',
-                textAlign: TextAlign.center,
-              ),
-            ),
-            Expanded(
-              // 名前入力エリアの設定
-              flex: dataExpandedFlex,
-              child: TextFormField(
-                maxLines: 1,
-                initialValue: name,
-                decoration: const InputDecoration(
-                  //labelText: '名前',
-                  hintText: '名前を入力してください',
-                ),
-                validator: (name) => name != null && name.isEmpty
-                    ? '名前は必ず入れてね'
-                    : null, // validateを設定
-                onChanged: (name) => setState(() => this.name = name),
-              ),
-            ),
-          ]),
-          // 性別の行の設定
-          Row(children: [
-            const Expanded(
-              // 見出し（性別）
-              flex: textExpandedFlex,
-              child: Text(
-                '性別',
-                textAlign: TextAlign.center,
-              ),
-            ),
-            Expanded(
-              // 性別をドロップダウンで設定
-              flex: dataExpandedFlex,
-              child: DropdownButton(
-                key: const ValueKey('gender'),
-                items: _list.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                value: _selected,
-                onChanged: _onChanged,
-              ),
-            ),
-          ]),
-          Row(children: [
-            const Expanded(
-              // 見出し（誕生日）
-              flex: textExpandedFlex,
-              child: Text(
-                '誕生日',
-                textAlign: TextAlign.center,
-              ),
-            ),
-            Expanded(
-              // 誕生日入力エリアの設定
-              flex: dataExpandedFlex,
-              child: TextFormField(
-                maxLines: 1,
-                initialValue: birthday,
-                decoration: const InputDecoration(
-                  hintText: '誕生日を入力してください',
-                ),
-                onChanged: (birthday) =>
-                    setState(() => this.birthday = birthday),
-              ),
-            ),
-          ]),
-          Row(children: [
-            const Expanded(
-                // 見出し（メモ）
+      body: isLoading 
+          ? const Center(
+            child: CircularProgressIndicator(),   // これが「グルグル」の処理
+          )
+        : SingleChildScrollView(
+          child: Column(children: <Widget>[
+            Row(children: [
+              // 名前の行の設定
+              const Expanded(
+                // 見出し（名前）
                 flex: textExpandedFlex,
                 child: Text(
-                  'メモ',
+                  '名前',
                   textAlign: TextAlign.center,
-                )),
-            Expanded(
-              // メモ入力エリアの設定
-              flex: dataExpandedFlex,
-              child: TextFormField(
-                maxLines: 1,
-                initialValue: memo,
-                decoration: const InputDecoration(
-                  hintText: 'メモを入力してください',
                 ),
-                onChanged: (memo) => setState(() => this.memo = memo),
               ),
-            ),
+              Expanded(
+                // 名前入力エリアの設定
+                flex: dataExpandedFlex,
+                child: TextFormField(
+                  maxLines: 1,
+                  initialValue: name,
+                  decoration: const InputDecoration(
+                    //labelText: '名前',
+                    hintText: '名前を入力してください',
+                  ),
+                  validator: (name) => name != null && name.isEmpty
+                      ? '名前は必ず入れてね'
+                      : null, // validateを設定
+                  onChanged: (name) => setState(() => this.name = name),
+                ),
+              ),
+            ]),
+            // 性別の行の設定
+            Row(children: [
+              const Expanded(
+                // 見出し（性別）
+                flex: textExpandedFlex,
+                child: Text(
+                  '性別',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Expanded(
+                // 性別をドロップダウンで設定
+                flex: dataExpandedFlex,
+                child: DropdownButton(
+                  key: const ValueKey('gender'),
+                  items: _list.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  value: _selected,
+                  onChanged: _onChanged,
+                ),
+              ),
+            ]),
+            Row(children: [
+              const Expanded(
+                // 見出し（誕生日）
+                flex: textExpandedFlex,
+                child: Text(
+                  '誕生日',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Expanded(
+                // 誕生日入力エリアの設定
+                flex: dataExpandedFlex,
+                child: TextFormField(
+                  maxLines: 1,
+                  initialValue: birthday,
+                  decoration: const InputDecoration(
+                    hintText: '誕生日を入力してください',
+                  ),
+                  onChanged: (birthday) =>
+                      setState(() => this.birthday = birthday),
+                ),
+              ),
+            ]),
+            Row(children: [
+              const Expanded(
+                  // 見出し（メモ）
+                  flex: textExpandedFlex,
+                  child: Text(
+                    'メモ',
+                    textAlign: TextAlign.center,
+                  )),
+              Expanded(
+                // メモ入力エリアの設定
+                flex: dataExpandedFlex,
+                child: TextFormField(
+                  maxLines: 1,
+                  initialValue: memo,
+                  decoration: const InputDecoration(
+                    hintText: 'メモを入力してください',
+                  ),
+                  onChanged: (memo) => setState(() => this.memo = memo),
+                ),
+              ),
+            ]),
           ]),
-        ]),
-      ),
+        ),
     );
   }
 
