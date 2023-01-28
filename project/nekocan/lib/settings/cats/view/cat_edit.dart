@@ -25,6 +25,7 @@ class _CatEditState extends State<CatEdit> {
 
   late Cats? cats;
   bool isLoading = false;
+  bool isFormValid = false;
 
 // Stateのサブクラスを作成し、initStateをオーバーライドすると、wedgit作成時に処理を動かすことができる。
 // ここでは、各項目の初期値を設定する
@@ -56,6 +57,7 @@ class _CatEditState extends State<CatEdit> {
     setState(() {
       _selected = value!;
       gender = _selected;
+      isFormValid = true;
     });
   }
 
@@ -77,118 +79,125 @@ class _CatEditState extends State<CatEdit> {
           ) // 保存ボタンを表示する
         ],
       ),
-      body: isLoading 
+      body: isLoading
           ? const Center(
-            child: CircularProgressIndicator(),   // これが「グルグル」の処理
-          )
-        : SingleChildScrollView(
-          child: Column(children: <Widget>[
-            Row(children: [
-              // 名前の行の設定
-              const Expanded(
-                // 見出し（名前）
-                flex: textExpandedFlex,
-                child: Text(
-                  '名前',
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              Expanded(
-                // 名前入力エリアの設定
-                flex: dataExpandedFlex,
-                child: TextFormField(
-                  maxLines: 1,
-                  initialValue: name,
-                  decoration: const InputDecoration(
-                    //labelText: '名前',
-                    hintText: '名前を入力してください',
+              child: CircularProgressIndicator(), // 「グルグル」の処理
+            )
+          : SingleChildScrollView(
+              child: Column(children: <Widget>[
+                Row(children: [
+                  // 名前の行の設定
+                  const Expanded(
+                    // 見出し（名前）
+                    flex: textExpandedFlex,
+                    child: Text(
+                      '名前',
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                  validator: (name) => name != null && name.isEmpty
-                      ? '名前は必ず入れてね'
-                      : null, // validateを設定
-                  onChanged: (name) => setState(() => this.name = name),
-                ),
-              ),
-            ]),
-            // 性別の行の設定
-            Row(children: [
-              const Expanded(
-                // 見出し（性別）
-                flex: textExpandedFlex,
-                child: Text(
-                  '性別',
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              Expanded(
-                // 性別をドロップダウンで設定
-                flex: dataExpandedFlex,
-                child: DropdownButton(
-                  key: const ValueKey('gender'),
-                  items: _list.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  value: _selected,
-                  onChanged: _onChanged,
-                ),
-              ),
-            ]),
-            Row(children: [
-              const Expanded(
-                // 見出し（誕生日）
-                flex: textExpandedFlex,
-                child: Text(
-                  '誕生日',
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              Expanded(
-                // 誕生日入力エリアの設定
-                flex: dataExpandedFlex,
-                child: TextFormField(
-                  maxLines: 1,
-                  initialValue: birthday,
-                  decoration: const InputDecoration(
-                    hintText: '誕生日を入力してください',
+                  Expanded(
+                    // 名前入力エリアの設定
+                    flex: dataExpandedFlex,
+                    child: TextFormField(
+                      maxLines: 1,
+                      initialValue: name,
+                      decoration: const InputDecoration(
+                        //labelText: '名前',
+                        hintText: '名前を入力してください',
+                      ),
+                      validator: (name) => name != null && name.isEmpty
+                          ? '名前は必ず入れてね'
+                          : null, // validateを設定
+                      onChanged: (name) => setState(() {
+                        this.name = name;
+                        isFormValid = true;
+                      }),
+                    ),
                   ),
-                  onChanged: (birthday) =>
-                      setState(() => this.birthday = birthday),
-                ),
-              ),
-            ]),
-            Row(children: [
-              const Expanded(
-                  // 見出し（メモ）
-                  flex: textExpandedFlex,
-                  child: Text(
-                    'メモ',
-                    textAlign: TextAlign.center,
-                  )),
-              Expanded(
-                // メモ入力エリアの設定
-                flex: dataExpandedFlex,
-                child: TextFormField(
-                  maxLines: 1,
-                  initialValue: memo,
-                  decoration: const InputDecoration(
-                    hintText: 'メモを入力してください',
+                ]),
+                // 性別の行の設定
+                Row(children: [
+                  const Expanded(
+                    // 見出し（性別）
+                    flex: textExpandedFlex,
+                    child: Text(
+                      '性別',
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                  onChanged: (memo) => setState(() => this.memo = memo),
-                ),
-              ),
-            ]),
-          ]),
-        ),
+                  Expanded(
+                    // 性別をドロップダウンで設定
+                    flex: dataExpandedFlex,
+                    child: DropdownButton(
+                      key: const ValueKey('gender'),
+                      items:
+                          _list.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      value: _selected,
+                      onChanged: _onChanged,
+                    ),
+                  ),
+                ]),
+                Row(children: [
+                  const Expanded(
+                    // 見出し（誕生日）
+                    flex: textExpandedFlex,
+                    child: Text(
+                      '誕生日',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  Expanded(
+                    // 誕生日入力エリアの設定
+                    flex: dataExpandedFlex,
+                    child: TextFormField(
+                      maxLines: 1,
+                      initialValue: birthday,
+                      decoration: const InputDecoration(
+                        hintText: '誕生日を入力してください',
+                      ),
+                      onChanged: (birthday) => setState(() {
+                        this.birthday = birthday;
+                        isFormValid = true;
+                      }),
+                    ),
+                  ),
+                ]),
+                Row(children: [
+                  const Expanded(
+                      // 見出し（メモ）
+                      flex: textExpandedFlex,
+                      child: Text(
+                        'メモ',
+                        textAlign: TextAlign.center,
+                      )),
+                  Expanded(
+                    // メモ入力エリアの設定
+                    flex: dataExpandedFlex,
+                    child: TextFormField(
+                      maxLines: 1,
+                      initialValue: memo,
+                      decoration: const InputDecoration(
+                        hintText: 'メモを入力してください',
+                      ),
+                      onChanged: (memo) => setState(() {
+                        this.memo = memo;
+                        isFormValid = true;
+                      }),
+                    ),
+                  ),
+                ]),
+              ]),
+            ),
     );
   }
 
 // 保存ボタンの設定
   Widget buildSaveButton() {
-    final isFormValid = name.isNotEmpty;
-
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: ElevatedButton(
