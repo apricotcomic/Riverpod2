@@ -4,18 +4,29 @@ import 'package:nekocan/common/cats_helper.dart';
 
 class CatEdit extends StatefulWidget {
   final int id;
+  final String name;
+  final String gender;
+  final String birthday;
+  final String memo;
 
-  const CatEdit({Key? key, required this.id}) : super(key: key);
+  const CatEdit(
+      {Key? key,
+      required this.id,
+      required this.name,
+      required this.gender,
+      required this.birthday,
+      required this.memo})
+      : super(key: key);
 
   @override
   _CatEditState createState() => _CatEditState();
 }
 
 class _CatEditState extends State<CatEdit> {
-  String name = ' ';
-  String birthday = ' ';
-  String gender = '不明';
-  String memo = ' ';
+  String inputName = ' ';
+  String inputGender = '不明';
+  String inputBirthday = ' ';
+  String inputMemo = ' ';
   DateTime createdAt = DateTime.now();
   final List<String> _list = <String>['男の子', '女の子', '不明']; // 性別のDropdownの項目を設定
   String _selected = '不明'; // Dropdownの選択値を格納するエリア
@@ -23,7 +34,7 @@ class _CatEditState extends State<CatEdit> {
   static const int textExpandedFlex = 1; // 見出しのexpaded flexの比率
   static const int dataExpandedFlex = 4; // 項目のexpanede flexの比率
 
-  late Cats? cats;
+  Cats? cats;
   bool isLoading = false;
   bool isFormValid = false;
 
@@ -33,30 +44,18 @@ class _CatEditState extends State<CatEdit> {
   void initState() {
     super.initState();
 
-    if (widget.id != 0) {
-      catData();
-    }
-  }
-
-// initStateで動かす処理
-// catsテーブルから指定されたidのデータを1件取得する
-  Future catData() async {
-    setState(() => isLoading = true);
-    cats = await CatsHelper.instance.catData(widget.id);
-    name = cats!.name;
-    birthday = cats!.birthday;
-    gender = cats!.gender;
-    _selected = cats!.gender;
-    memo = cats!.memo;
-    createdAt = cats!.createdAt;
-    setState(() => isLoading = false);
+    inputName = widget.name;
+    inputGender = widget.gender;
+    _selected = widget.gender;
+    inputBirthday = widget.birthday;
+    inputMemo = widget.memo;
   }
 
 // Dropdownの値の変更を行う
   void _onChanged(String? value) {
     setState(() {
       _selected = value!;
-      gender = _selected;
+      inputGender = _selected;
       isFormValid = true;
     });
   }
@@ -68,7 +67,7 @@ class _CatEditState extends State<CatEdit> {
       appBar: AppBar(
         title: const Text('猫編集'),
         actions: [
-          buildSaveButton(),
+          buildSaveButton(), // 保存ボタンを表示する
           IconButton(
             onPressed: () async {
               // ゴミ箱のアイコンが押されたときの処理を設定
@@ -76,7 +75,7 @@ class _CatEditState extends State<CatEdit> {
               Navigator.of(context).pop(); // 削除後に前の画面に戻る
             },
             icon: const Icon(Icons.delete), // ゴミ箱マークのアイコンを表示
-          ) // 保存ボタンを表示する
+          )
         ],
       ),
       body: isLoading
@@ -100,7 +99,7 @@ class _CatEditState extends State<CatEdit> {
                     flex: dataExpandedFlex,
                     child: TextFormField(
                       maxLines: 1,
-                      initialValue: name,
+                      initialValue: widget.name,
                       decoration: const InputDecoration(
                         //labelText: '名前',
                         hintText: '名前を入力してください',
@@ -109,7 +108,7 @@ class _CatEditState extends State<CatEdit> {
                           ? '名前は必ず入れてね'
                           : null, // validateを設定
                       onChanged: (name) => setState(() {
-                        this.name = name;
+                        inputName = name;
                         isFormValid = true;
                       }),
                     ),
@@ -156,12 +155,12 @@ class _CatEditState extends State<CatEdit> {
                     flex: dataExpandedFlex,
                     child: TextFormField(
                       maxLines: 1,
-                      initialValue: birthday,
+                      initialValue: widget.birthday,
                       decoration: const InputDecoration(
                         hintText: '誕生日を入力してください',
                       ),
                       onChanged: (birthday) => setState(() {
-                        this.birthday = birthday;
+                        inputBirthday = birthday;
                         isFormValid = true;
                       }),
                     ),
@@ -180,12 +179,12 @@ class _CatEditState extends State<CatEdit> {
                     flex: dataExpandedFlex,
                     child: TextFormField(
                       maxLines: 1,
-                      initialValue: memo,
+                      initialValue: widget.memo,
                       decoration: const InputDecoration(
                         hintText: 'メモを入力してください',
                       ),
                       onChanged: (memo) => setState(() {
-                        this.memo = memo;
+                        inputMemo = memo;
                         isFormValid = true;
                       }),
                     ),
@@ -214,39 +213,20 @@ class _CatEditState extends State<CatEdit> {
 
 // 保存ボタンを押したとき実行する処理
   void createOrUpdateCat() async {
-    if (widget.id == 0) {
-      await createCat(); // insertの処理
-    } else {
-      await updateCat(); // updateの処理
-    }
-
-    Navigator.of(context).pop(); // 前の画面に戻る
-  }
-
-  // 更新処理の呼び出し
-  Future updateCat() async {
-    final cat = cats?.copy(
-      // 画面の内容をcatにセット
-      name: name,
-      birthday: birthday,
-      gender: gender,
-      memo: memo,
-    );
-
-    await CatsHelper.instance.update(cat!); // catの内容で更新する
-  }
-
-  // 追加処理の呼び出し
-  Future createCat() async {
     final cat = Cats(
-      // 入力された内容をcatにセット
+      // 画面の内容をcatにセット
       id: widget.id,
-      name: name,
-      birthday: birthday,
-      gender: gender,
-      memo: memo,
+      name: inputName,
+      birthday: inputBirthday,
+      gender: inputGender,
+      memo: inputMemo,
       createdAt: createdAt,
     );
-    await CatsHelper.instance.insert(cat); // catの内容で追加する
+    if (widget.id == 0) {
+      await CatsHelper.instance.insert(cat); // catの内容で追加する
+    } else {
+      await CatsHelper.instance.update(cat); // catの内容で更新する
+    }
+    Navigator.of(context).pop(); // 前の画面に戻る
   }
 }

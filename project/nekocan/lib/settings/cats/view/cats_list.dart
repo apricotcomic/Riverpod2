@@ -68,7 +68,13 @@ class _CatListPageState extends State<CatList> {
                     onTap: () async {                     // cardをtapしたときの処理を設定
                       await Navigator.of(context).push(   // ページ遷移をNavigatorで設定
                         MaterialPageRoute(
-                          builder: (context) => CatEdit(id: cat.id!),   // cardのデータの詳細を表示するcat_edit.dartへ遷移
+                          builder: (context) => CatEdit(
+                            id: cat.id!,
+                            name: cat.name,
+                            gender: cat.gender,
+                            birthday: cat.birthday,
+                            memo: cat.memo,
+                          ),   // cardのデータの詳細を表示するcat_edit.dartへ遷移
                         ),
                       );
                       getCatsList();    // データが更新されているかもしれないので、catsテーブル全件読み直し
@@ -82,11 +88,17 @@ class _CatListPageState extends State<CatList> {
         child: const Icon(Icons.add),                               // ボタンの形を指定
         onPressed: () async {                                       // ＋ボタンを押したときの処理を設定
           await Navigator.of(context).push(                         // ページ遷移をNavigatorで設定
-            MaterialPageRoute(
-              builder: (context) => const CatEdit(id:0)           // 詳細更新画面（元ネタがないから新規登録）を表示するcat_detail_edit.dartへ遷移
+            MaterialPageRoute(    // 詳細更新画面（元ネタがないから新規登録）を表示するcat_detail_edit.dartへ遷移
+              builder: (context) => const CatEdit(
+                id: 0,
+                name: ' ',
+                gender: '不明',
+                birthday: ' ',
+                memo: ' ',
+              )
             ),
           );
-          getCatsList();                                            // 新規登録されているので、catテーブル全件読み直し
+          getCatsList();  // 新規登録されているので、catテーブル全件読み直し
         },
       ),
     );

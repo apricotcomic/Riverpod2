@@ -85,9 +85,10 @@ class _CatListPageState extends State<CatList> {
                                       image:
                                           AssetImage('assets/icon/dora.png')))),
                           Text(
+                          // catのnameを表示
                             cat.name,
                             style: const TextStyle(fontSize: 30),
-                          ), // catのnameを表示
+                          ), 
                         ]),
                       ),
                       onTap: () async {
@@ -96,8 +97,12 @@ class _CatListPageState extends State<CatList> {
                           // ページ遷移をNavigatorで設定
                           MaterialPageRoute(
                             builder: (context) => CatEdit(
-                                id: cat
-                                    .id!), // cardのデータの詳細を表示するcat_detail.dartへ遷移
+                                id: cat.id!,
+                                name: cat.name,
+                                gender: cat.gender,
+                                birthday: cat.birthday,
+                                memo: cat.memo
+                                ), // cardのデータの詳細を表示するcat_detail.dartへ遷移
                           ),
                         );
                         getCatsList(); // データが更新されているかもしれないので、catsテーブル全件読み直し
@@ -114,9 +119,13 @@ class _CatListPageState extends State<CatList> {
           // ＋ボタンを押したときの処理を設定
           await Navigator.of(context).push(
             // ページ遷移をNavigatorで設定
-            MaterialPageRoute(
+            MaterialPageRoute(  // 詳細更新画面（元ネタがないから新規登録）を表示するcat_detail_edit.dartへ遷移
                 builder: (context) => const CatEdit(
-                    id: 0) // 詳細更新画面（元ネタがないから新規登録）を表示するcat_detail_edit.dartへ遷移
+                    id: 0,
+                    name: ' ',
+                    gender: '不明',
+                    birthday: ' ',
+                    memo: ' ') 
                 ),
           );
           getCatsList(); // 新規登録されているので、catテーブル全件読み直し
