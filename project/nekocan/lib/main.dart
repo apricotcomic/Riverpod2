@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nekocan/model/cats.dart';
 import 'package:nekocan/common/cats_helper.dart';
-import 'package:nekocan/settings/cats/view/cat_edit.dart';
+import 'package:nekocan/view/cat_edit.dart';
 
 void main() {
   runApp(const NekocanApp());
